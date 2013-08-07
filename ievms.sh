@@ -72,7 +72,7 @@ create_home() {
 check_system() {
     kernel=`uname -s`
     case $kernel in
-        Darwin|Linux) ;;
+        Darwin|Linux|CYGWIN_NT-6.1) ;;
         *) fail "Sorry, $kernel is not supported." ;;
     esac
 }
@@ -283,7 +283,7 @@ install_ie_win7() { # vm url
 
 
 # Install the UtiluMFC
-install_utilumfc_xp(){
+install_utilumfcdownlo_xp(){
     local src=`basename "${2}"`
     local dest="/Documents and Settings/IEUser/Desktop/${src}"
 
@@ -292,7 +292,7 @@ install_utilumfc_xp(){
     wait_for_guestcontrol "${1}"
     copy_to_vm "${1}" "${src}" "${dest}"
 
-    log "Installing IE" # Always "fails"
+    log "Installing UtiluMFC" # Always "fails"
     VBoxManage guestcontrol "${1}" exec --image "${dest}" \
         --username IEUser --wait-exit -- /passive /norestart || true
 
@@ -314,7 +314,7 @@ install_utilumfc_win7(){
     wait_for_guestcontrol "${1}" "${pass}"
     copy_to_vm "${1}" "${src}" "${dest}" "${pass}"
 
-    log "Installing IE"
+    log "Installing UtiluMFC"
     VBoxManage guestcontrol "${1}" exec --image "cmd.exe" \
         --username IEUser --password "${pass}" --wait-exit -- \
         /c "echo ${dest} /passive /norestart >C:\\Users\\IEUser\\ievms.bat"
