@@ -20,6 +20,12 @@ reuse_xp=${REUSE_XP:-"yes"}
 # Reuse Win7 virtual machines for IE versions that are supported.
 reuse_win7=${REUSE_WIN7:-"yes"}
 
+# Optionally install All the FireFoxes + WebDev Tools in all the VMS
+install_firefox=${UtiluMFC:-"yes"}
+
+# Install Extra IE Debug Tools in all the VMS
+# install_iedebug_tools = ${IEDEBUG_TOOLS:-"yes"}
+
 # Timeout interval to wait between checks for various states.
 sleep_wait="10"
 
@@ -275,6 +281,53 @@ install_ie_win7() { # vm url
     wait_for_shutdown "${1}"
 }
 
+
+# Install the UtiluMFC
+install_utilumfc_xp(){
+    local src=`basename "${2}"`
+    local dest="/Documents and Settings/IEUser/Desktop/${src}"
+
+    download "${src}" "${2}" "${src}"
+    start_vm "${1}"
+    wait_for_guestcontrol "${1}"
+    copy_to_vm "${1}" "${src}" "${dest}"
+
+    log "Installing IE" # Always "fails"
+    VBoxManage guestcontrol "${1}" exec --image "${dest}" \
+        --username IEUser --wait-exit -- /passive /norestart || true
+
+    log "Shutting down ${1}"
+    VBoxManage guestcontrol "${1}" exec --image "shutdown.exe" \
+        --username IEUser --wait-exit -- /s /f /t 0
+
+    wait_for_shutdown "${1}"
+}
+
+# Install the UtiluMFC
+install_utilumfc_win7(){
+    local src=`basename "${2}"`
+    local dest="/Users/IEUser/Desktop/${src}"
+    local pass='Passw0rd!'
+
+    download "${src}" "${2}" "${src}"
+    start_vm "${1}"
+    wait_for_guestcontrol "${1}" "${pass}"
+    copy_to_vm "${1}" "${src}" "${dest}" "${pass}"
+
+    log "Installing IE"
+    VBoxManage guestcontrol "${1}" exec --image "cmd.exe" \
+        --username IEUser --password "${pass}" --wait-exit -- \
+        /c "echo ${dest} /passive /norestart >C:\\Users\\IEUser\\ievms.bat"
+    VBoxManage guestcontrol "${1}" exec --image "cmd.exe" \
+        --username IEUser --password "${pass}" --wait-exit -- \
+        /c "echo shutdown.exe /s /f /t 0 >>C:\\Users\\IEUser\\ievms.bat"
+    VBoxManage guestcontrol "${1}" exec --image "schtasks.exe" \
+        --username IEUser --password "${pass}" --wait-exit -- \
+        /run /tn ievms
+
+    wait_for_shutdown "${1}"
+}
+
 # Build an ievms virtual machine given the IE version desired.
 build_ievm() {
     unset archive
@@ -349,6 +402,7 @@ build_ievm_ie7() {
     else
         boot_ievms "IE7 - WinXP"
         install_ie_xp "IE7 - WinXP" "http://download.microsoft.com/download/3/8/8/38889dc1-848c-4bf2-8335-86c573ad86d9/IE7-WindowsXP-x86-enu.exe"
+        install_utilumfc "IE7 - WinXP" "http://download.betanews.com/download/1263393583-1/UtiluMFC1098.exe"
     fi
 }
 
