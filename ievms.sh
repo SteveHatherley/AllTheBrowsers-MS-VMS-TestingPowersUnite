@@ -402,7 +402,7 @@ build_ievm_ie7() {
     else
         boot_ievms "IE7 - WinXP"
         install_ie_xp "IE7 - WinXP" "http://download.microsoft.com/download/3/8/8/38889dc1-848c-4bf2-8335-86c573ad86d9/IE7-WindowsXP-x86-enu.exe"
-        install_utilumfc "IE7 - WinXP" "http://download.betanews.com/download/1263393583-1/UtiluMFC1098.exe"
+        install_utilumfc_xp "IE7 - WinXP" "http://download.betanews.com/download/1263393583-1/UtiluMFC1098.exe"
     fi
 }
 
