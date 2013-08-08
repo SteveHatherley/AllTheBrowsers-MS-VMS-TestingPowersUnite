@@ -283,7 +283,7 @@ install_ie_win7() { # vm url
 
 
 # Install the UtiluMFC
-install_utilumfcdownlo_xp(){
+install_utilumfc_xp(){
     local src=`basename "${2}"`
     local dest="/Documents and Settings/IEUser/Desktop/${src}"
 
